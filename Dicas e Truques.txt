@@ -1,0 +1,14 @@
+Site do TailWind com CSS prontos: https://tailwindcss.com/docs/background-color
+
+Css Puro > TailWind
+
+background-color > bg-
+margin      >   m-
+    left        ml-
+    right       mr-
+    top         mt-
+    bottom      mb-
+
+padding     >   p-
+height      >   h-
+width       >   w-
