@@ -2,6 +2,11 @@
 ### AULA 5: ROTAS DE DIAGNÓSTICO
 ### =====================================
 
-### Testa integridade do sistema (Health Check)
+### Teste rota principal fallback
+GET http://localhost:3000/
 
+### Testa integridade do sistema (Health Check)
 GET http://localhost:3000/api/health
+
+### Testar versão do sistema (Version Check)
+GET http://localhost:3000/api/version
