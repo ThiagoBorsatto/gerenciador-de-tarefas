@@ -16,4 +16,10 @@ Desenvolver um gerenciador de tarefas completo, multi-usuário, persistindo os d
 
 * Novo index.txt para guardar o código original da aula 1, o Five Server apenas pode ler o index.html do projeto, assim para poder acompanhar o desenvolvimento da aplicação em tempo real.
 
+index.html gerenciador de tarefas
+
+## REST Client
+Criar um dos dois tipos de arquivos:
+1) .http
+2) .rest
 * Novo código no index.html; gerenciador de tarefas fornecido pelo professor.
