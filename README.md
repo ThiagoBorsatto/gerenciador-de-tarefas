@@ -17,3 +17,8 @@ Formatar um código com o Tailwind para deixar organizado.
 Novo index.txt para guardar o original, já que o Five Server só pode ler o index.html, feito essa mudança para poder usar o Five Server para o projeto principal.
 
 index.html gerenciador de tarefas
+
+## REST Client
+Criar um dos dois tipos de arquivos:
+1) .http
+2) .rest

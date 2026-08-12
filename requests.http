@@ -1,0 +1,7 @@
+### =====================================
+### AULA 5: ROTAS DE DIAGNÓSTICO
+### =====================================
+
+### Testa integridade do sistema (Health Check)
+
+GET http://localhost:3000/api/health
