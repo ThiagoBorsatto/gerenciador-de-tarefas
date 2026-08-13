@@ -28,6 +28,18 @@ app.post("/api/tasks", (req, res) => {
     res.status(201).json(novaTarefa);
 });
 
+// Deletar tarefa (Delete Taks)
+app.delete("/api/tasks/:id", (req, res) => {
+    const idParaDeletar = parseInt(req.params.id);
+    const tarefaExiste = bancoDeDadosProvisorio.some(t => t.id === idParaDeletar);
+
+    if (!tarefaExiste) {
+        return res.status(404).json({ message: "Tarefa não existe!" });
+    }
+    
+    bancoDeDadosProvisorio = bancoDeDadosProvisorio.filter(t => t.id !== idParaDeletar);
+    res.json({ message: "Tarefa removida com sucesso!" });
+});
 
 // Rota principal de FALLBACK
 app.get("/",(req, res) => {
