@@ -18,7 +18,7 @@ Desenvolver um gerenciador de tarefas completo, multi-usuário, persistindo os d
 
 index.html gerenciador de tarefas
 
-## Dia 12/08/2026
+## Dia 12/08/2026 - Aula 5:
 ### Configuração inicial do Back-end
 
 * Definição das dependências do projeto usando node
