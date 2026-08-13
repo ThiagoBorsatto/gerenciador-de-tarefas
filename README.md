@@ -22,17 +22,16 @@ index.html gerenciador de tarefas
 ### Configuração inicial do Back-end
 
 * Definição das dependências do projeto usando node
-* Arquivo server.ts, configuração do listen para do servidor e criação do GET do status do servidor e a versão atual do sistema.
-* Requests.http, arquivo para realização dos testes de endpoints, ultilizando a extensão REST Client
+* arquivo server.ts, configuração do listen do servidor e criação do GET do status do servidor e a versão atual do sistema.
+criação dos GET, POST e DELETE da tarefa.
+* requests.http, arquivo para realização dos testes de endpoints, ultilizando a extensão REST Client
 
 ## REST Client
 ### Criar um dos dois tipos de arquivos:
-* 1) .http
-* 2) .rest
+* .http
+* .rest
 
-### Configuração do arquivo
-Os request devem ser separados por ###, se não o request não vai ser identificado.
-Criar um dos dois tipos de arquivos:
-1) .http
-2) .rest
+### Configuração do arquivo .http
+Os request devem ser separados por ###, se não o REST Client não vai identificar os request.
+
 * Novo código no index.html; gerenciador de tarefas fornecido pelo professor.
