@@ -34,3 +34,10 @@ criação dos GET, POST e DELETE da tarefa.
 Os request devem ser separados por ###, se não o REST Client não vai identificar os request.
 
 * Novo código no index.html; gerenciador de tarefas fornecido pelo professor.
+
+## Dia 19/08/2026 - Aula 6
+### Configuração do Banco de Dados e Criação das primeiras tabelas
+
+* Instalação dos pacotes do SQLite
+* Criação das tabelas de Tarefas e Usuários
+* Validação para quando o DB estiver vazio a aplicação criar um usuário para popular o banco de dados
