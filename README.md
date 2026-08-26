@@ -41,3 +41,9 @@ Os request devem ser separados por ###, se não o REST Client não vai identific
 * Instalação dos pacotes do SQLite
 * Criação das tabelas de Tarefas e Usuários
 * Validação para quando o DB estiver vazio a aplicação criar um usuário para popular o banco de dados
+
+## Dia 26/08/2026 - Aula 7
+### Criação dos métodos de PUT/PATCH e novo DELETE
+
+* Criação do método de UPDATE de dados das tarefas
+* Novo DELET, com novas validações
