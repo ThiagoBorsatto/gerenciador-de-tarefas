@@ -1,25 +1,28 @@
+@baseUrl = http://localhost:3000
+
 ### =====================================
 ### AULA 5: ROTAS DE DIAGNÓSTICO
 ### =====================================
 
 ### Teste rota principal fallback
-GET http://localhost:3000/
+GET {{baseUrl}}
 
 ### Testa integridade do sistema (Health Check)
-GET http://localhost:3000/api/health
+GET {{baseUrl}}/api/health
 
 ### Testar versão do sistema (Version Check)
-GET http://localhost:3000/api/version
+GET {{baseUrl}}/api/version
 
 ### Listar todas as tarefas (GET)
-GET http://localhost:3000/api/tasks
+GET {{baseUrl}}/api/tasks
 
 ### Adicionar nova tarefa (POST)
-POST http://localhost:3000/api/tasks
+POST {{baseUrl}}/api/tasks
 Content-Type: application/json
 
 {
-    "title": "Minha nova tarefa do dia 12/08/2026"
+    "title": "Minha nova tarefa do dia 02/09/2026",
+    "prioridade": "low"
 }
 
 ### Deletar tarefa por Id (DELETE), http://URL/endpoint/id
