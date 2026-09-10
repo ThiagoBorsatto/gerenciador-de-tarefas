@@ -4,10 +4,59 @@ import Database from "better-sqlite3";
 const app = express();
 const PORT = 3000;
 
+// Criação da Interface de tarefas
+interface Tarefa {
+  id: number;
+  titulo: string;
+  status: string;
+  prioridade: string;
+}
+
+// Centralizamos as regras
+const PRIORIDADES = ["low","medium","high"] as const;
+const STATUS_VALIDOS = ["pending","completed"] as const;
+
+// Helpers: escrevemos a validação uma vez
+const tituloValido = (t: unknown): t is string =>
+  typeof t === "string" && t.trim().length >= 3;
+
+const normalizarPrioridade = (p: unknown) => {
+  const listaPrioridades = PRIORIDADES as readonly string[];
+
+  return typeof p === "string" && listaPrioridades.includes(p)
+    ? p
+    : "medium";
+};
+
+const normalizarStatus = (s: unknown) => {
+  const listaStatus = STATUS_VALIDOS as readonly string[];
+  
+  return typeof s === "string" && listaStatus.includes(s)
+    ? s
+    : "pending";
+};
+
+// Trasforma e validar IDs
+const parsearId = (idParam: string): number | null => {
+  const id = Number(idParam);
+
+// Number("12abc") vira NaN imediatamente, o que é mais seguro!
+  return isNaN(id) ? null : id;
+};
+
 // Middware para ler os corpo das requisições em formato JSON
 app.use(express.json());
 
 const db = new Database("tarefas.db");
+
+// Busca do Banco de Dados
+const stmtContarUsuarios = db.prepare("SELECT COUNT(*) as count FROM usuarios");
+const stmtInserirUsuario = db.prepare("INSERT INTO usuarios (email, senha) VALUES (?, ?)");
+const stmtListarTodas = db.prepare("SELECT * FROM tarefas");
+const stmtBuscarPorTitulo = db.prepare("SELECT * FROM tarefas WHERE titulo LIKE ?");
+const stmtBuscarPorId = db.prepare("SELECT * FROM tarefas WHERE id = ?");
+const stmtInserirTarefa = db.prepare("INSERT INTO tarefas (titulo, status, prioridade) VALUES (?, 'pending', ?)");
+const stmtDeletarTarefa = db.prepare("DELETE FROM tarefas WHERE id = ?");
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS tarefas (
@@ -25,32 +74,28 @@ db.exec(`
 `);
 
 // Inserindo dados falsos para serem vazados
-const usuariosExistentes = db.prepare("SELECT COUNT(*) AS count FROM usuarios").get() as any;
+const usuariosExistentes = stmtContarUsuarios.get() as { count: number };
 if (usuariosExistentes.count === 0) {
-    db.exec(`
-        INSERT INTO usuarios (email, senha) VALUES ('admin@senai.com', 'senha_super_segura_123');    
-    `);
+  stmtInserirUsuario.run("admin@senai.com", "senha_super_secreta_123");
 }
 
 console.log("Banco de dados SQLite inicializado com sucesso!");
 
 // Rota da tarefas (Tasks)
 app.get("/api/tasks", (req, res) => {
-    const { search } = req.query;
-    try {
-        if (search) {
-            // Prepared Statement: O '?' protege contra Injeção de SQL.
-            const sql = "SELECT * FROM tarefas WHERE titulo LIKE ?";
-            const tarefas = db.prepare(sql).all(`%${search}%`);
-            res.json(tarefas);
-        } else {
-            const tarefas = db.prepare("SELECT * FROM tarefas").all();
-            res.json(tarefas);
-        }
-    } catch (erro) {
-        // Exibir o erro real ajuda a compreender a quebra de sintaxe gerada pelo ataque
-        res.status(500).json({ error: erro instanceof Error ? erro.message : "Erro desconhecido" });
+  const search = typeof req.query.search === "string" ? req.query.search : "";
+  
+  try {
+    if (search) {
+      const tarefas = stmtBuscarPorTitulo.all(`%${search}%`);
+      res.json(tarefas);
+    } else {
+      const tarefas = stmtListarTodas.all();
+      res.json(tarefas);
     }
+  } catch {
+    res.status(500).json({ error: "Erro interno ao processar a listagem." });
+  }
 });
 
 // Criar nova tarefa (New Task)

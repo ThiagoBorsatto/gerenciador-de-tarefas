@@ -160,3 +160,9 @@ DELETE http://localhost:3000/api/tasks/1
 # Este teste valida o erro 404 e a mensagem customizada
 # do seu 'if (resultado.changes === 0)'
 DELETE http://localhost:3000/api/tasks/99999
+
+### 31. Teste de Array Injection (A Busca Bizarra)
+GET http://localhost:3000/api/tasks?search=a&search=b
+
+### 32. Teste de Parâmetro Indefinido (O Acidente)
+GET http://localhost:3000/api/tasks?search[]=a&search[]=b
