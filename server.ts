@@ -2,7 +2,7 @@ import express from "express";
 import Database from "better-sqlite3";
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Criação da Interface de tarefas
 interface Tarefa {
@@ -13,8 +13,8 @@ interface Tarefa {
 }
 
 // Centralizamos as regras
-const PRIORIDADES = ["low","medium","high"] as const;
-const STATUS_VALIDOS = ["pending","completed"] as const;
+const PRIORIDADES = ["low", "medium", "high"] as const;
+const STATUS_VALIDOS = ["pending", "completed"] as const;
 
 // Helpers: escrevemos a validação uma vez
 const tituloValido = (t: unknown): t is string =>
@@ -30,7 +30,7 @@ const normalizarPrioridade = (p: unknown) => {
 
 const normalizarStatus = (s: unknown) => {
   const listaStatus = STATUS_VALIDOS as readonly string[];
-  
+
   return typeof s === "string" && listaStatus.includes(s)
     ? s
     : "pending";
@@ -40,7 +40,7 @@ const normalizarStatus = (s: unknown) => {
 const parsearId = (idParam: string): number | null => {
   const id = Number(idParam);
 
-// Number("12abc") vira NaN imediatamente, o que é mais seguro!
+  // Number("12abc") vira NaN imediatamente, o que é mais seguro!
   return isNaN(id) ? null : id;
 };
 
@@ -84,7 +84,7 @@ console.log("Banco de dados SQLite inicializado com sucesso!");
 // Rota da tarefas (Tasks)
 app.get("/api/tasks", (req, res) => {
   const search = typeof req.query.search === "string" ? req.query.search : "";
-  
+
   try {
     if (search) {
       const tarefas = stmtBuscarPorTitulo.all(`%${search}%`);
@@ -100,163 +100,156 @@ app.get("/api/tasks", (req, res) => {
 
 // Criar nova tarefa (New Task)
 app.post("/api/tasks", (req, res) => {
-    const { title, prioridade } = req.body;
-    const prioridadeValida = ['low', 'medium', 'high'].includes(prioridade) ? prioridade : 'medium';
-    
-    // Validação rígida: Título obrigatório, não vazio e com tamanho mínimo
-    // Sanitizamos com .trim() ANTES de checar o length, aplicando a regra de negócio
-    if (!title || title.trim().length < 3) {
-        return res.status(400).json({ 
-            error: "O título da tarefa é obrigatório e deve conter pelo menos 3 caracteres válidos." 
-        });
-    }
+  const { titulo, prioridade } = req.body;
+  const prioridadeValida = normalizarPrioridade(prioridade);
 
-    try {
-        const sql = "INSERT INTO tarefas (titulo, status, prioridade) VALUES (?, 'pending', ?)";
-        const resultado = db.prepare(sql).run(title.trim(), prioridadeValida);
-        
-        // Retorna o objeto recém-criado usando o ID gerado (lastInsertRowid).
-        const novaTarefa = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(resultado.lastInsertRowid);
-        return res.status(201).json(novaTarefa);
-    } catch (erro) {
-        return res.status(500).json({ error: "Erro ao processar persistência" });
-    }
+  // Validação via helper (type guard)
+  if (!tituloValido(titulo)) {
+    return res.status(400).json({
+      error: "O título da tarefa é obrigatório e deve conter pelo menos 3 caracteres válidos."
+    });
+  }
+  try {
+    const resultado = stmtInserirTarefa.run(titulo.trim(), prioridadeValida);
+    const novaTarefa = stmtBuscarPorId.get(resultado.lastInsertRowid) as Tarefa;
+
+    return res.status(201).json(novaTarefa);
+  } catch {
+    return res.status(500).json({
+      error: "Erro ao processar persistência"
+    });
+  }
 });
 
 // Rota para deletar fisicamente uma tarefa do banco
 app.delete("/api/tasks/:id", (req, res) => {
-    const { id } = req.params;
-    try {
-        const sql = "DELETE FROM tarefas WHERE id = ?";
-        const resultado = db.prepare(sql).run(id);
-        
-        // No SQLite, o sucesso é medido pelo número de 
-        // linhas afetadas (changes)
-        if (resultado.changes === 0) {
-            res.status(404).json(
-                { error: "Tarefa não localizada para exclusão." }
-            );
-            return;
-        }
-        res.json(
-            { message: "Tarefa excluída do banco SQLite com sucesso!" }
-        );
-    } catch (erro) { 
-        res.status(500).json(
-        { error: erro instanceof Error ? erro.message : "Erro desconhecido" }
-        );
+  // Validação de ID padronizada (igual PUT/PATCH)
+  const idParaDeletar = parsearId(req.params.id);
+
+  if (idParaDeletar === null) {
+    return res.status(400).json({ error: "ID inválido." });
+  }
+
+  try {
+    const resultado = stmtDeletarTarefa.run(idParaDeletar);
+
+    if (resultado.changes === 0) {
+      return res.status(404).json({
+        error: "Tarefa não localizada para exclusão."
+      });
     }
+    res.json({
+      message: "Tarefa excluída do banco SQLite com sucesso!"
+    });
+  } catch {
+    res.status(500).json({
+      error: "Erro interno ao processar a exclusão."
+    });
+  }
 });
 
 // Rota principal de FALLBACK
-app.get("/",(req, res) => {
-    res.json({ turma: "ADS-2025" });
+app.get("/", (req, res) => {
+  res.json({ turma: "ADS-2025" });
 });
 
 // Rota de integridade do sistema (Health Check)
 app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", message: "Servidor do Gestor de Tarefas ativo!" });
+  res.json({ status: "ok", message: "Servidor do Gestor de Tarefas ativo!" });
 });
 
 // Rota da versão do sistema (Version Check)
-app.get("/api/version",(req, res) => {
-    res.json({ appName: "Gerenciador de Tarefas Multi-Usuários", version: "1.0.0" });
+app.get("/api/version", (req, res) => {
+  res.json({ appName: "Gerenciador de Tarefas Multi-Usuários", version: "1.0.0" });
 });
 
 // A Rota PUT atualiza uma tarefa existente no SQLite com validações estritas
 app.put("/api/tasks/:id", (req, res) => {
-  const idParaAtualizar = parseInt(req.params.id);
-  
-  // 1. Validação do ID numérico recebido na URL
-  if (isNaN(idParaAtualizar)) {
+  const idParaAtualizar = parsearId(req.params.id);
+
+  if (idParaAtualizar === null) {
     return res.status(400).json({ error: "ID inválido." });
   }
 
+  const { titulo, prioridade, status } = req.body;
 
-  const { title, prioridade, status } = req.body;
-
-
-  // 2. Validação rígida do Título (assim como na Aula 10)
-  if (!title || title.trim().length < 3) {
+  // Validação via helpers
+  if (!tituloValido(titulo)) {
     return res.status(400).json({
       error: "O título da tarefa é obrigatório e deve conter pelo menos 3 caracteres válidos."
     });
   }
 
-
-  // 3. Sanitização e valores padrão para prioridade e status
-  const prioridadeValida = ['low', 'medium', 'high'].includes(prioridade) ? prioridade : 'medium';
-  const statusValido = ['pending', 'completed'].includes(status) ? status : 'pending';
-
+  const prioridadeValida = normalizarPrioridade(prioridade);
+  const statusValido = normalizarStatus(status);
 
   try {
-    // 4. Execução do UPDATE utilizando Prepared Statement (?) para segurança
-    const sql = "UPDATE tarefas SET titulo = ?, status = ?, prioridade = ? WHERE id = ?";
-    const resultado = db.prepare(sql).run(title.trim(), statusValido, prioridadeValida, idParaAtualizar);
+    // Prepared statement inline (UPDATE completo não tem statement fixo no topo)
+    const sql = "UPDATE tarefas SET titulo = ?, status = ?, prioridade = ? WHERE id = ? ";
+    const resultado = db.prepare(sql).run(titulo.trim(), statusValido, prioridadeValida, idParaAtualizar);
 
-
-    // 5. Verifica se alguma linha foi de fato modificada no banco
     if (resultado.changes === 0) {
-      return res.status(404).json({ message: "Tarefa não encontrada para atualização!" });
+      return res.status(404).json({
+        message: "Tarefa não encontrada para atualização!"
+      });
     }
 
-
-    // 6. Busca a tarefa recém-atualizada para retornar no corpo da resposta (Princípio REST)
-    const tarefaAtualizada = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(idParaAtualizar);
+    const tarefaAtualizada = stmtBuscarPorId.get(idParaAtualizar) as Tarefa;
     return res.status(200).json(tarefaAtualizada);
 
+  } catch {
 
-  } catch (erro) {
-    return res.status(500).json({ error: "Erro ao processar a atualização no banco de dados." });
+    return res.status(500).json({
+      error: "Erro ao processar a atualização no banco de dados."
+    });
   }
 });
 
 // A Rota PATCH executa atualizações parciais com validações sob demanda de forma segura e atômica
 app.patch("/api/tasks/:id", (req, res) => {
-  const idParaAtualizar = parseInt(req.params.id);
-  
-  if (isNaN(idParaAtualizar)) {
+  const idParaAtualizar = parsearId(req.params.id);
+
+  if (idParaAtualizar === null) {
     return res.status(400).json({ error: "ID inválido." });
   }
-
 
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: "Nenhum campo fornecido para atualização." });
   }
 
-  const { title, prioridade, status } = req.body;
+  const { titulo, prioridade, status } = req.body;
 
   try {
-    // Usamos uma transação para garantir consistência ao buscar e atualizar (evita estado parcial)
     const fluxoAtualizacao = db.transaction(() => {
-      // 3. Busca o registro atual no banco para validação cruzada/existência
-      const tarefaExistente = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(idParaAtualizar) as any;
+      // Busca com statement singleton
+      const tarefaExistente = stmtBuscarPorId.get(idParaAtualizar) as Tarefa | undefined;
+
       if (!tarefaExistente) return null;
 
       const camposParaAtualizar: string[] = [];
-      const valoresParaAtualizar: any[] = [];
+      const valoresParaAtualizar: unknown[] = [];
 
-      // 4. Validação condicional: Título (se enviado)
-      if (title !== undefined) {
-        if (typeof title !== "string" || title.trim().length < 3) {
+      // Título (se enviado)
+      if (titulo !== undefined) {
+        if (!tituloValido(titulo)) {
           throw new Error("O título da tarefa deve conter pelo menos 3 caracteres válidos.");
         }
         camposParaAtualizar.push("titulo = ?");
-        valoresParaAtualizar.push(title.trim());
+        valoresParaAtualizar.push(titulo.trim());
       }
 
-      // 5. Validação condicional: Prioridade (se enviada)
+      // Prioridade (se enviada)
       if (prioridade !== undefined) {
-        if (!['low', 'medium', 'high'].includes(prioridade)) {
+        if (!PRIORIDADES.includes(prioridade as typeof PRIORIDADES[number])) {
           throw new Error("Prioridade inválida. Use 'low', 'medium' ou 'high'.");
         }
         camposParaAtualizar.push("prioridade = ?");
         valoresParaAtualizar.push(prioridade);
       }
 
-      // 6. Validação condicional: Status (se enviado)
+      // Status (se enviado)
       if (status !== undefined) {
-        if (!['pending', 'completed'].includes(status)) {
+        if (!STATUS_VALIDOS.includes(status as typeof STATUS_VALIDOS[number])) {
           throw new Error("Status inválido. Use 'pending' ou 'completed'.");
         }
         camposParaAtualizar.push("status = ?");
@@ -265,12 +258,12 @@ app.patch("/api/tasks/:id", (req, res) => {
 
       if (camposParaAtualizar.length === 0) return tarefaExistente;
 
-      // 7. Montagem segura da query dinâmica com Prepared Statements
+      // Query dinâmica SEGURA: placeholders ? + valores array
       const sql = `UPDATE tarefas SET ${camposParaAtualizar.join(", ")} WHERE id = ?`;
-      valoresParaAtualizar.push(idParaAtualizar);
 
+      valoresParaAtualizar.push(idParaAtualizar);
       db.prepare(sql).run(...valoresParaAtualizar);
-      return db.prepare("SELECT * FROM tarefas WHERE id = ?").get(idParaAtualizar);
+      return stmtBuscarPorId.get(idParaAtualizar) as Tarefa;
     });
 
     const resultado = fluxoAtualizacao();
@@ -280,16 +273,16 @@ app.patch("/api/tasks/:id", (req, res) => {
     }
 
     return res.status(200).json(resultado);
-
   } catch (erro) {
-    if (erro instanceof Error && 
-       (erro.message.includes("inválid") || erro.message.includes("caracteres"))) {
+    // Distingue erro de validação (400) de erro interno (500)
+    if (erro instanceof Error && (erro.message.includes("inválid") || erro.message.includes("caracteres"))) {
       return res.status(400).json({ error: erro.message });
     }
+
     return res.status(500).json({ error: "Erro ao processar a atualização parcial no banco." });
   }
 });
 
 app.listen(PORT, () => {
-    console.log(`Servido rodando em: http://localhost:${PORT}`);
+  console.log(`Servido rodando em: http://localhost:${PORT}`);
 });
