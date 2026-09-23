@@ -1,8 +1,17 @@
 import express from "express";
 import Database from "better-sqlite3";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "super_secreto_desenvolvimento";
+
+interface Usuario {
+  id: number;
+  email: string;
+  senha: string;
+}
 
 // Criação da Interface de tarefas
 interface Tarefa {
@@ -49,6 +58,21 @@ app.use(express.json());
 
 const db = new Database("tarefas.db");
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS tarefas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    prioridade TEXT DEFAULT 'medium'
+  );
+
+  CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    senha TEXT NOT NULL
+  );
+`);
+
 // Busca do Banco de Dados
 const stmtContarUsuarios = db.prepare("SELECT COUNT(*) as count FROM usuarios");
 const stmtInserirUsuario = db.prepare("INSERT INTO usuarios (email, senha) VALUES (?, ?)");
@@ -57,21 +81,8 @@ const stmtBuscarPorTitulo = db.prepare("SELECT * FROM tarefas WHERE titulo LIKE 
 const stmtBuscarPorId = db.prepare("SELECT * FROM tarefas WHERE id = ?");
 const stmtInserirTarefa = db.prepare("INSERT INTO tarefas (titulo, status, prioridade) VALUES (?, 'pending', ?)");
 const stmtDeletarTarefa = db.prepare("DELETE FROM tarefas WHERE id = ?");
-
-db.exec(`
-    CREATE TABLE IF NOT EXISTS tarefas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        titulo TEXT NOT NULL,
-        status TEXT DEFAULT 'pending',
-        prioridade TEXT DEFAULT 'medium'
-    );    
-
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT NOT NULL,
-        senha TEXT NOT NULL
-    );
-`);
+const stmtBuscarUsuarioPorId = db.prepare("SELECT * FROM usuarios WHERE id = ?");
+const stmtBuscarUsuarioPorEmail = db.prepare("SELECT * FROM usuarios WHERE email = ?");
 
 // Inserindo dados falsos para serem vazados
 const usuariosExistentes = stmtContarUsuarios.get() as { count: number };
@@ -80,6 +91,60 @@ if (usuariosExistentes.count === 0) {
 }
 
 console.log("Banco de dados SQLite inicializado com sucesso!");
+
+// /api/auth/register:
+app.post("/api/auth/register", (req, res) => {
+  const { email, senha } = req.body;
+
+  // Validação inicial dos dados
+  if (typeof email !== "string" || typeof senha !== "string") {
+    return res.status(400).json({
+      error: "E-mail e senha são obrigatórios."
+    });
+  }
+
+  if (senha.trim().length < 6) {
+    return res.status(400).json({
+      error: "A senha deve ter ao menos 6 caracteres."
+    });
+  }
+
+  // Criando a "impressão digital" da senha
+  const hash = bcrypt.hashSync(senha, 10);
+  try {
+    const resultado = stmtInserirUsuario.run(email.trim(), hash);
+    const usuario =
+      stmtBuscarUsuarioPorId.get(resultado.lastInsertRowid) as Usuario;
+    return res.status(201).json({
+      id: usuario.id, email:
+        usuario.email
+    });
+  } catch {
+    return res.status(409).json({ error: "E-mail já cadastrado." });
+  }
+});
+
+app.post("/api/auth/login", (req, res) => {
+  const { email, senha } = req.body;
+  if (typeof email !== "string" || typeof senha !== "string") {
+    return res.status(400).json({
+      error: "E-mail e senha são obrigatórios." });
+}
+
+const usuario = stmtBuscarUsuarioPorEmail.get(email.trim()) as Usuario | undefined;
+
+// Compara SEMPRE com hash (mesmo se usuário não existir) para evitar vazamento
+const hashEsperado = usuario?.senha ?? "$2a$10$fakehashparanaquebrarcomparacao";
+const senhaOk = bcrypt.compareSync(senha, hashEsperado);
+  if (!usuario || !senhaOk) {
+    return res.status(401).json({
+      error: "Credenciais inválidas." });
+    }
+
+// Gerando o "Crachá" de acesso
+const token = jwt.sign({ id: usuario.id, email: usuario.email }, JWT_SECRET, {expiresIn: "2h",});
+      return res.json({ token });
+    });
 
 // Rota da tarefas (Tasks)
 app.get("/api/tasks", (req, res) => {
