@@ -38,8 +38,10 @@ Desenvolver um **gerenciador de tarefas completo e multi-usuário**, persistindo
 | ▸ | **Busca por título** | `GET /api/tasks?search=termo` com proteção contra SQL Injection |
 | ▸ | **Validação centralizada** | Helpers (`tituloValido`, `normalizarPrioridade`, `parsearId`...) reutilizados por todas as rotas |
 | ▸ | **Registro e login** | Senhas guardadas como hash (bcrypt) e login que devolve um token JWT válido por 2h |
+| ▸ | **Rotas protegidas** | Todas as rotas de tarefas exigem o token JWT (middleware `authenticate`) |
+| ▸ | **Isolamento de usuários** | Cada usuário só vê e altera as próprias tarefas (`usuario_id`) |
 | ▸ | **PATCH atômico** | Atualizações parciais dentro de uma transação do SQLite |
-| ▸ | **Erros padronizados** | `400` validação · `401` credenciais · `404` não encontrado · `409` conflito · `500` erro interno genérico |
+| ▸ | **Erros padronizados** | `400` validação · `401` credenciais/token · `404` não encontrado · `409` conflito · `500` erro interno genérico |
 
 ---
 
@@ -98,13 +100,16 @@ O servidor sobe em **http://localhost:3000** e o banco `tarefas.db` é criado au
 
 ### Tarefas
 
+> [!IMPORTANT]
+> Todas as rotas de tarefas exigem o cabeçalho `Authorization: Bearer <token>` (token gerado no login). Sem token, ou com token inválido/expirado, a resposta é `401`. Tarefas de outro usuário respondem `404`.
+
 | Método | Rota | Corpo | Respostas |
 |:-:|---|---|---|
-| ![GET](https://img.shields.io/badge/GET-2ea44f?style=flat-square) | `/api/tasks?search=` | — | `200` · `500` |
-| ![POST](https://img.shields.io/badge/POST-0969da?style=flat-square) | `/api/tasks` | `{ "titulo", "prioridade" }` | `201` · `400` · `500` |
-| ![PUT](https://img.shields.io/badge/PUT-bf8700?style=flat-square) | `/api/tasks/:id` | `{ "titulo", "prioridade", "status" }` | `200` · `400` · `404` · `500` |
-| ![PATCH](https://img.shields.io/badge/PATCH-8250df?style=flat-square) | `/api/tasks/:id` | qualquer campo acima | `200` · `400` · `404` · `500` |
-| ![DELETE](https://img.shields.io/badge/DELETE-cf222e?style=flat-square) | `/api/tasks/:id` | — | `200` · `400` · `404` · `500` |
+| ![GET](https://img.shields.io/badge/GET-2ea44f?style=flat-square) | `/api/tasks?search=` | — | `200` · `401` · `500` |
+| ![POST](https://img.shields.io/badge/POST-0969da?style=flat-square) | `/api/tasks` | `{ "titulo", "prioridade" }` | `201` · `400` · `401` · `500` |
+| ![PUT](https://img.shields.io/badge/PUT-bf8700?style=flat-square) | `/api/tasks/:id` | `{ "titulo", "prioridade", "status" }` | `200` · `400` · `401` · `404` · `500` |
+| ![PATCH](https://img.shields.io/badge/PATCH-8250df?style=flat-square) | `/api/tasks/:id` | qualquer campo acima | `200` · `400` · `401` · `404` · `500` |
+| ![DELETE](https://img.shields.io/badge/DELETE-cf222e?style=flat-square) | `/api/tasks/:id` | — | `200` · `400` · `401` · `404` · `500` |
 
 > [!NOTE]
 > **Regras de validação**
@@ -159,12 +164,14 @@ erDiagram
         TEXT titulo
         TEXT status "pending | completed"
         TEXT prioridade "low | medium | high"
+        INTEGER usuario_id FK
     }
     USUARIOS {
         INTEGER id PK
         TEXT email UK
         TEXT senha "hash bcrypt"
     }
+    USUARIOS ||--o{ TAREFAS : "possui"
 ```
 
 ---
@@ -184,6 +191,8 @@ timeline
     09/09 : Sanitização do código
     16/09 : Segurança das rotas de escrita
     23/09 : Registro e login (bcrypt + JWT)
+    30/09 : Rotas protegidas com JWT
+          : Isolamento de usuários
 ```
 
 <details>
@@ -235,6 +244,7 @@ Reflexões semanais sobre o que foi aprendido, as dificuldades e como foram reso
 | 09/09 | 01 | Começo da sanitização do código | [abrir →](Semanario/09%20de%20setembro%20de%202026.md) |
 | 16/09 | 05 | Segurança das rotas de escrita | [abrir →](Semanario/16%20de%20setembro%20de%202026.md) |
 | 23/09 | 06 | Autenticação (registro e login) | [abrir →](Semanario/23%20de%20setembro%20de%202026.md) |
+| 30/09 | 07 | Rotas protegidas e isolamento de usuários | [abrir →](Semanario/30%20de%20setembro%20de%202026.md) |
 
 <details>
 <summary><b>02/09 — Ambiente e primeiros passos</b></summary>
@@ -303,6 +313,27 @@ const search = typeof req.query.search === "string" ? req.query.search : "";
 **» Observação** — O uso de token é bem interessante; quero estudar mais por fora para entender os detalhes.
 
 [Ler o registro completo →](Semanario/23%20de%20setembro%20de%202026.md)
+
+</details>
+
+<details>
+<summary><b>30/09 — Protegendo rotas com JWT e isolamento de usuários</b></summary>
+
+**» O que aprendi**
+- **Autenticação × autorização**: autenticar é saber quem o usuário é (o token do login); autorizar é deixar ele mexer só no que é dele.
+- **Middleware**: função `(req, res, next)` que roda antes da rota. Se chama `next()`, a requisição segue; se devolve `401`, a rota nem executa. A verificação do token fica em um lugar só.
+
+**» Dificuldade** — Depois de aplicar a apostila, o servidor nem subia: `The requested module 'express' does not provide an export named 'NextFunction'`.
+
+**» Solução** — Marcar os três imports como tipo:
+
+```ts
+import express, { type Request, type Response, type NextFunction } from "express";
+```
+
+**» Observação** — Testei com dois usuários: um não consegue ver, editar nem apagar a tarefa do outro, e sem token a resposta é sempre `401`.
+
+[Ler o registro completo →](Semanario/30%20de%20setembro%20de%202026.md)
 
 </details>
 

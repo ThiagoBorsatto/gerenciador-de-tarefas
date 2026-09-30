@@ -1,4 +1,4 @@
-[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)
+[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](30%20de%20setembro%20de%202026.md)
 
 # Aula 06 — Adicionando Autenticação e Segurança (Registro e Login) - 23/09/2026
 
@@ -17,4 +17,4 @@ O uso do TOKEN é algo bem interessante, mas para entender melhor vou ter que da
 
 ---
 
-[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)
+[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](30%20de%20setembro%20de%202026.md)
