@@ -1,3 +1,5 @@
+[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)
+
 # Aula 06 — Adicionando Autenticação e Segurança (Registro e Login) - 23/09/2026
 
 ## O que eu aprendi
@@ -12,3 +14,7 @@ Só quando eu cópiei os teste para o requests.http acabei quebrando teste pelo 
 
 ## Observações (opcional)
 O uso do TOKEN é algo bem interessante, mas para entender melhor vou ter que dar uma olhada por fora, que nesse momento oque foi feito não revelou muitos detalhes.
+
+---
+
+[← Semana anterior](16%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)

@@ -1,3 +1,5 @@
+[← Semana anterior](09%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](23%20de%20setembro%20de%202026.md)
+
 # Aula 05 — Segurança das rotas de escrita (16/09/2026)
 
 ## O que eu aprendi
@@ -12,3 +14,7 @@ Conferindo o arquivo e oque eu tenho no local consegui achar a parte que faltou,
 
 ## Observações (opcional)
 Nada pra hoje também.
+
+---
+
+[← Semana anterior](09%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](23%20de%20setembro%20de%202026.md)

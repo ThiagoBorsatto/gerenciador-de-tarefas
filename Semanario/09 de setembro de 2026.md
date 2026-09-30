@@ -1,3 +1,5 @@
+[← Semana anterior](02%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](16%20de%20setembro%20de%202026.md)
+
 # Aula 01 — Começo da sanitização do código (09/09/2026)
 
 ## O que eu aprendi
@@ -15,3 +17,7 @@ Onde o dois testes caíam na segunda parte do código.
 
 ## Observações (opcional)
 Hoje nenhuma.
+
+---
+
+[← Semana anterior](02%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](16%20de%20setembro%20de%202026.md)
