@@ -236,3 +236,27 @@ Content-Type: application/json
 "email": "aluno@senai.com",
 "senha": "senhaerrada"
 }
+
+### ============================================
+### AULA: Protegendo Rotas com JWT
+### ============================================
+
+### Atenção: Faça login (Teste 38 da aula passada) e copie o token gerado.
+### Substitua <SEU_TOKEN_AQUI> pelo token real copiado (sem as setas <>).
+
+### 3. (Protegido) Listar todas as tarefas do usuário logado
+GET http://localhost:3000/api/tasks
+Authorization: Bearer <SEU_TOKEN_AQUI>
+
+### 3B. Teste de Segurança: Acessar sem token (deve retornar 401)
+GET http://localhost:3000/api/tasks
+
+### 5. (Protegido) Criar uma nova tarefa
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+Authorization: Bearer <SEU_TOKEN_AQUI>
+
+{
+  "titulo": "Minha Tarefa Isolada",
+  "prioridade": "high"
+}
