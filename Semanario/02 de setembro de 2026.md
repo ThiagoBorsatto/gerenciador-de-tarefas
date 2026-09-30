@@ -1,3 +1,5 @@
+[↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](09%20de%20setembro%20de%202026.md)
+
 # Aula 00 — Ambiente e primeiros passos (02/09/2026)
 
 ## O que eu aprendi
@@ -15,3 +17,7 @@ O comando estava sendo execultado no terminal mas no dir errado, fazendo que o n
 
 ## Observações (opcional)
 Eu prefiro continuar no Codespace, toda a configuração de ambiente havia sido realizada anteriormente.
+
+---
+
+[↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](09%20de%20setembro%20de%202026.md)
