@@ -245,6 +245,9 @@ Reflexões semanais sobre o que foi aprendido, as dificuldades e como foram reso
 | 16/09 | 05 | Segurança das rotas de escrita | [abrir →](Semanario/16%20de%20setembro%20de%202026.md) |
 | 23/09 | 06 | Autenticação (registro e login) | [abrir →](Semanario/23%20de%20setembro%20de%202026.md) |
 | 30/09 | 07 | Rotas protegidas e isolamento de usuários | [abrir →](Semanario/30%20de%20setembro%20de%202026.md) |
+| 07/10 | 06 | Introdução ao React | [abrir →](Semanario/07%20de%20outubro%20de%202026.md) |
+| 21/10 | 07 | Alteração do back-end e front-end | [abrir →](Semanario/21%20de%20outubro%20de%202026.md) |
+| 28/10 | 08 | Laboratório prático: Gerenciador de Tarefas | [abrir →](Semanario/28%20de%20outubro%20de%202026.md) |
 
 <details>
 <summary><b>02/09 — Ambiente e primeiros passos</b></summary>

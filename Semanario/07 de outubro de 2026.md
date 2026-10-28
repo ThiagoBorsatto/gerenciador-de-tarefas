@@ -1,3 +1,5 @@
+[← Semana anterior](30%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](21%20de%20outubro%20de%202026.md)
+
 # Aula 06 — Aula de React - 07/10/2026
 
 ## O que eu aprendi
@@ -11,3 +13,7 @@ Até o momento nada, foi bem explicado!
 
 ## Observações (opcional)
 É bem interesante o uso dos compontes para montar as telas, o uso do BOTAO que nos fizemos, que pode fazer três coisas diferentes foi muito interesante.
+
+---
+
+[← Semana anterior](30%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](21%20de%20outubro%20de%202026.md)
