@@ -1,4 +1,4 @@
-[← Semana anterior](23%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)
+[← Semana anterior](23%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](07%20de%20outubro%20de%202026.md)
 
 # Aula 07 — Protegendo rotas com JWT e isolamento de usuários (30/09/2026)
 
@@ -23,4 +23,4 @@ Testei com dois usuários: um não consegue ver, editar nem apagar a tarefa do o
 
 ---
 
-[← Semana anterior](23%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário)
+[← Semana anterior](23%20de%20setembro%20de%202026.md) · [↑ Voltar ao README](../README.md#semanário) · [Próxima semana →](07%20de%20outubro%20de%202026.md)
