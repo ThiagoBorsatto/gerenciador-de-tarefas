@@ -1,0 +1,23 @@
+ # Dependências (as duas: raiz e front)
+ node_modules/
+
+ # Build do front: é gerado por `npm run build:web`, nunca versionado.
+ # Guardar no Git um build de 200 KB que qualquer um reconstrói com um comando
+ # só cria conflito toda vez que duas pessoas mexerem na tela.
+ web/dist/
+
+ # Banco de dados local. Nasce sozinho na primeira execução e é zerado se for
+ # apagado — versionar seria guardar o histórico de todos os alunos que
+ # usaram a máquina.
+ tarefas.db
+ tarefas.db-journal
+ *.db-wal
+ *.db-shm
+
+ # Segredos. O JWT_SECRET de verdade nunca entra no repositório.
+ .env
+ .env.local
+ 
+ # Logs e ruído de build
+ *.log
+ npm-debug.log*
