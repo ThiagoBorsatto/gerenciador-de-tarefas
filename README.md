@@ -240,14 +240,15 @@ Reflexões semanais sobre o que foi aprendido, as dificuldades e como foram reso
 
 | Data | Aula | Tema | Registro |
 |:-:|:-:|---|:-:|
-| 02/09 | 00 | Ambiente e primeiros passos | [abrir →](Semanario/02%20de%20setembro%20de%202026.md) |
-| 09/09 | 01 | Começo da sanitização do código | [abrir →](Semanario/09%20de%20setembro%20de%202026.md) |
-| 16/09 | 05 | Segurança das rotas de escrita | [abrir →](Semanario/16%20de%20setembro%20de%202026.md) |
-| 23/09 | 06 | Autenticação (registro e login) | [abrir →](Semanario/23%20de%20setembro%20de%202026.md) |
-| 30/09 | 07 | Rotas protegidas e isolamento de usuários | [abrir →](Semanario/30%20de%20setembro%20de%202026.md) |
-| 07/10 | 06 | Introdução ao React | [abrir →](Semanario/07%20de%20outubro%20de%202026.md) |
-| 21/10 | 07 | Alteração do back-end e front-end | [abrir →](Semanario/21%20de%20outubro%20de%202026.md) |
-| 28/10 | 08 | Laboratório prático: Gerenciador de Tarefas | [abrir →](Semanario/28%20de%20outubro%20de%202026.md) |
+| 02/09 | 00 | Ambiente e primeiros passos | [abrir →](Semanario/2026-09-02.md) |
+| 09/09 | 01 | Começo da sanitização do código | [abrir →](Semanario/2026-09-09.md) |
+| 16/09 | 05 | Segurança das rotas de escrita | [abrir →](Semanario/2026-09-16.md) |
+| 23/09 | 06 | Autenticação (registro e login) | [abrir →](Semanario/2026-09-23.md) |
+| 30/09 | 07 | Rotas protegidas e isolamento de usuários | [abrir →](Semanario/2026-09-30.md) |
+| 07/10 | 06 | Introdução ao React | [abrir →](Semanario/2026-10-07.md) |
+| 21/10 | 07 | Alteração do back-end e front-end | [abrir →](Semanario/2026-10-21.md) |
+| 28/10 | 08 | Laboratório prático: Gerenciador de Tarefas | [abrir →](Semanario/2026-10-28.md) |
+| 04/11 | 09 | Banco de dados em nuvem (Turso / libSQL) | [abrir →](Semanario/2026-11-04.md) |
 
 <details>
 <summary><b>02/09 — Ambiente e primeiros passos</b></summary>
@@ -263,7 +264,7 @@ Reflexões semanais sobre o que foi aprendido, as dificuldades e como foram reso
 
 **» Observação** — Prefiro continuar no Codespace, onde o ambiente já estava configurado.
 
-[Ler o registro completo →](Semanario/02%20de%20setembro%20de%202026.md)
+[Ler o registro completo →](Semanario/2026-09-02.md)
 
 </details>
 
@@ -282,7 +283,7 @@ Reflexões semanais sobre o que foi aprendido, as dificuldades e como foram reso
 const search = typeof req.query.search === "string" ? req.query.search : "";
 ```
 
-[Ler o registro completo →](Semanario/09%20de%20setembro%20de%202026.md)
+[Ler o registro completo →](Semanario/2026-09-09.md)
 
 </details>
 
@@ -297,7 +298,7 @@ const search = typeof req.query.search === "string" ? req.query.search : "";
 
 **» Solução** — Comparando o arquivo com a versão local, encontrei a parte que faltava e corrigi.
 
-[Ler o registro completo →](Semanario/16%20de%20setembro%20de%202026.md)
+[Ler o registro completo →](Semanario/2026-09-16.md)
 
 </details>
 
@@ -315,7 +316,7 @@ const search = typeof req.query.search === "string" ? req.query.search : "";
 
 **» Observação** — O uso de token é bem interessante; quero estudar mais por fora para entender os detalhes.
 
-[Ler o registro completo →](Semanario/23%20de%20setembro%20de%202026.md)
+[Ler o registro completo →](Semanario/2026-09-23.md)
 
 </details>
 
@@ -336,7 +337,7 @@ import express, { type Request, type Response, type NextFunction } from "express
 
 **» Observação** — Testei com dois usuários: um não consegue ver, editar nem apagar a tarefa do outro, e sem token a resposta é sempre `401`.
 
-[Ler o registro completo →](Semanario/30%20de%20setembro%20de%202026.md)
+[Ler o registro completo →](Semanario/2026-09-30.md)
 
 </details>
 

@@ -1,13 +1,18 @@
 /**
- * App.tsx — o "cerebro" da aplicação: decide qual tela mostrar.
+ * App.tsx — o "cérebro" da aplicação: decide qual tela mostrar.
  *
- * Hoje existem dois estados possíveis:
+ * Existem dois estados possíveis:
  *   - deslogado -> mostra o <Login />
- *   - logado    -> mostra o placeholder que será a lista de tarefas (Aula 07)
+ *   - logado    -> mostra o <Tarefas />
+ *
+ * O App não sabe nada sobre tarefas: ele só guarda QUEM está logado e
+ * entrega essa informação para a tela seguinte. Quem manda na lista de
+ * tarefas é o próprio Tarefas.tsx.
  */
 
 import { useState } from "react";
 import Login from "./Login";
+import Tarefas from "./Tarefas";
 import { clearToken, getUsuario, type Usuario } from "./api";
 
 export default function App() {
@@ -15,7 +20,7 @@ export default function App() {
    * O useState recebe uma FUNÇÃO como valor inicial. O React entende que
    * aquilo é uma "fábrica" e a chama uma única vez, já no primeiro render.
    *
-   * Por que não getUsuario() direto? Porque a cada re-render o array
+   * Por que não getUsuario() direto? Porque a cada re-render o par
    * [usuario, setUsuario] é recriado. Se chamássemos direto, o token seria
    * lido e decodificado a cada tecla digitada na tela.
    */
@@ -24,6 +29,9 @@ export default function App() {
   /**
    * Derivamos o "está logado?" do próprio usuario, em vez de guardar dois
    * estados que poderiam ficar dessincronizados (ex.: logado=true e usuario=null).
+   *
+   * Por isso NÃO existe um setLogado neste arquivo: quem loga e quem sai é o
+   * usuario. Um estado a menos para manter em dia, uma classe de bug a menos.
    */
   const logado = usuario !== null;
 
@@ -32,7 +40,13 @@ export default function App() {
     setUsuario(getUsuario());
   };
 
-  /** Chamado pelo botão "Sair": apaga o token e volta ao login. */
+  /**
+   * Chamado pelo botão "Sair" do Tarefas.
+   *
+   * Repare que o apagamento do token acontece AQUI, e não dentro do Tarefas.
+   * Quem cuida da sessão é o App; a tela de tarefas só avisa "a pessoa pediu
+   * para sair". Assim existe um único lugar no projeto que apaga o token.
+   */
   const aoSair = (): void => {
     clearToken();
     setUsuario(null);
@@ -42,23 +56,5 @@ export default function App() {
     return <Login aoLogar={aoLogar} />;
   }
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
-      <header className="text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
-          Bem-vindo, {usuario.email}!
-        </h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Autenticação funcionando. A lista de tarefas chega na Aula 07.
-        </p>
-      </header>
-
-      <button
-        onClick={aoSair}
-        className="rounded-md border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-slate-500 hover:text-white"
-      >
-        Sair
-      </button>
-    </div>
-  );
+  return <Tarefas usuario={usuario} aoSair={aoSair} />;
 }
