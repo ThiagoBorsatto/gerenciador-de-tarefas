@@ -307,6 +307,25 @@ app.get("/api/health", async (_req: Request, res: Response) => {
     }
 });
 
+// Diagnóstico do banco em produção: lista as tabelas e quantas linhas cada uma tem
+app.get("/api/db-check", async (_req: Request, res: Response) => {
+    try {
+        await db.execute("SELECT 1");
+        const { rows: tabelas } = await db.execute({
+            sql: "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+        });
+        const contagem: Record<string, number> = {};
+        for (const t of tabelas) {
+            const nome = (t as any).name;
+            const { rows } = await db.execute({ sql: `SELECT COUNT(*) as total FROM ${nome}` });
+            contagem[nome] = Number((rows[0] as any).total);
+        }
+        return res.json({ ok: true, tabelas: tabelas.map((t) => (t as any).name), contagem });
+    } catch (erro: any) {
+        return res.status(503).json({ ok: false, erro: erro?.message || "Falha ao consultar banco" });
+    }
+});
+
 app.post("/api/auth/register", async (req: Request, res: Response) => {
     const email = req.body?.email;
     const senha = lerSenha(req.body);
